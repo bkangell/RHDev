@@ -1,7 +1,8 @@
 DECLARE @CopyFromCTUserFormsMasterKey	INT;
 DECLARE @NewFormDescription				VARCHAR(MAX);
-set @CopyFromCTUserFormsMasterKey = 28;
-SELECT	@NewFormDescription= (select FormDescription from  Claimtrakv0905_bangell_06DEC2015.dbo.CTUserFormsMaster where ID=@CopyFromCTUserFormsMasterKey)
+set @CopyFromCTUserFormsMasterKey = 28; -- REPLACE WITH the source master key
+-- USE FIND AND REPLACE TO REPLACE SRC_DBASE WITH THE SOURCE DATABASE.  Should be 22 occurrences.
+SELECT	@NewFormDescription= (select FormDescription from  SRC_DBASE.dbo.CTUserFormsMaster where ID=@CopyFromCTUserFormsMasterKey)
 
 Create Table #TempControlList (id int identity(1,1), RowTypeKey int, CopyCTUserFormsDetailControlKey int, NewDetailKey int)
 Create Table #TempDetailList (id int identity(1,1), RowTypeKey int, CopyCTUserFormsDetailKey int, NewDetailKey int)
@@ -42,7 +43,7 @@ Declare
 declare @SqlString varchar(max)
 
 select * into #t1
-	from Claimtrakv0905_bangell_06DEC2015.dbo.CTUserFormsMaster
+	from SRC_DBASE.dbo.CTUserFormsMaster
 	where ID =  @CopyFromCTUserFormsMasterKey
 
 INSERT INTO [dbo].[CTUserFormsMaster]
@@ -159,7 +160,7 @@ em.[FormDescription]
     ,em.[HeaderOrFooterKey]
     ,em.[WindowHeight]
     ,em.[WindowWidth]
-	FROM Claimtrakv0905_bangell_06DEC2015.dbo.CTUserFormsMaster em where em.id=@CopyFromCTUserFormsMasterKey
+	FROM SRC_DBASE.dbo.CTUserFormsMaster em where em.id=@CopyFromCTUserFormsMasterKey
 
 set @NewKey = @@Identity
 
@@ -202,7 +203,7 @@ set @Key = @NewKey
 	End  -- @MinKeyCol
 
 	set @SqlString = @SqlString + ' from '+@TableName+ ' t '+
-		' join Claimtrakv0905_bangell_06DEC2015.dbo.'+@TableName+ ' t1 on t1.ID = '+str(@CopyFromCTUserFormsMasterKey)+
+		' join SRC_DBASE.dbo.'+@TableName+ ' t1 on t1.ID = '+str(@CopyFromCTUserFormsMasterKey)+
 		' where t.ID = '+str(@NewKey)
 print '207'+@SqlString
 	execute (@SqlString)					
@@ -212,7 +213,7 @@ print '207'+@SqlString
 
 	Insert into #TempDetailList (RowTypeKey, CopyCTUserFormsDetailKey)
 		Select 1, cfd.ID
-		From Claimtrakv0905_bangell_06DEC2015.dbo.CTUserFormsDetail cfd
+		From SRC_DBASE.dbo.CTUserFormsDetail cfd
 		where cfd.CTUserFormsMasterKey = @CopyFromCTUserFormsMasterKey
 		
 	select @MinKey1 = min(ID), @MaxKey1 = max(ID) 
@@ -289,7 +290,7 @@ print '207'+@SqlString
 
 			set @SqlString = @SqlString + 
 					' from '+@TableName+ ' t '+
-					' join Claimtrakv0905_bangell_06DEC2015.dbo.'+@TableName+ ' t1 on t1.ID = '+str(@DetailKey1)+
+					' join SRC_DBASE.dbo.'+@TableName+ ' t1 on t1.ID = '+str(@DetailKey1)+
 					' where t.ID = '+str(@NewDetailKey)
 print '294 '+@SQLString
 			execute (@SqlString)					
@@ -312,22 +313,22 @@ WHERE CTUserFormsMasterKey = @NewKey
 
 -- Add a new set of questions to CTUserFormsQuestionMaster with it's own CTUserFormsQuestionMasterGUID -- WI 16004658, 07/13/2017 CR
 SELECT @MinKey1 = MIN(CTUserFormsQuestionMasterKey), @MaxKey1 = MAX(CTUserFormsQuestionMasterKey) 
-FROM Claimtrakv0905_bangell_06DEC2015.dbo.CTUserFormsDetail
+FROM SRC_DBASE.dbo.CTUserFormsDetail
 WHERE CTUserFormsMasterKey = @CopyFromCTUserFormsMasterKey
 
 WHILE @MinKey1 <= @MaxKey1
 BEGIN
-	SET	@QMQuestion = (SELECT Question FROM Claimtrakv0905_bangell_06DEC2015.dbo.CTUserFormsQuestionMaster WHERE ID = @MinKey1 AND Question IN(SELECT Question FROM CTUserFormsDetail WHERE CTUserFormsMasterKey = @NewKey))
-	SET	@QMQTypeKey	 = (SELECT QTypeKey FROM Claimtrakv0905_bangell_06DEC2015.dbo.CTUserFormsQuestionMaster WHERE ID = @MinKey1 AND Question IN(SELECT Question FROM CTUserFormsDetail WHERE CTUserFormsMasterKey = @NewKey)) 
-	SET	@QMDateTypeKey = (SELECT DateTypeKey FROM Claimtrakv0905_bangell_06DEC2015.dbo.CTUserFormsQuestionMaster WHERE ID = @MinKey1 AND Question IN(SELECT Question FROM CTUserFormsDetail WHERE CTUserFormsMasterKey = @NewKey))
-	SET	@QMStringLength = (SELECT StringLength FROM Claimtrakv0905_bangell_06DEC2015.dbo.CTUserFormsQuestionMaster WHERE ID = @MinKey1 AND Question IN(SELECT Question FROM CTUserFormsDetail WHERE CTUserFormsMasterKey = @NewKey))
-	SET	@QMStringFormatKey = (SELECT StringFormatKey FROM Claimtrakv0905_bangell_06DEC2015.dbo.CTUserFormsQuestionMaster WHERE ID = @MinKey1 AND Question IN(SELECT Question FROM CTUserFormsDetail WHERE CTUserFormsMasterKey = @NewKey))
-	SET	@QMRows = (SELECT Rows FROM Claimtrakv0905_bangell_06DEC2015.dbo.CTUserFormsQuestionMaster WHERE ID = @MinKey1 AND Question IN(SELECT Question FROM CTUserFormsDetail WHERE CTUserFormsMasterKey = @NewKey))
-	SET	@QMFieldWidth = (SELECT FieldWidth FROM Claimtrakv0905_bangell_06DEC2015.dbo.CTUserFormsQuestionMaster WHERE ID = @MinKey1 AND Question IN(SELECT Question FROM CTUserFormsDetail WHERE CTUserFormsMasterKey = @NewKey))
-	SET	@QMComments = (SELECT Comments FROM Claimtrakv0905_bangell_06DEC2015.dbo.CTUserFormsQuestionMaster WHERE ID = @MinKey1 AND Question IN(SELECT Question FROM CTUserFormsDetail WHERE CTUserFormsMasterKey = @NewKey))
-	SET	@QMCTUserFormsCoreFieldKey = (SELECT CTUserFormsCoreFieldKey FROM Claimtrakv0905_bangell_06DEC2015.dbo.CTUserFormsQuestionMaster WHERE ID = @MinKey1 AND Question IN(SELECT Question FROM CTUserFormsDetail WHERE CTUserFormsMasterKey = @NewKey))
+	SET	@QMQuestion = (SELECT Question FROM SRC_DBASE.dbo.CTUserFormsQuestionMaster WHERE ID = @MinKey1 AND Question IN(SELECT Question FROM CTUserFormsDetail WHERE CTUserFormsMasterKey = @NewKey))
+	SET	@QMQTypeKey	 = (SELECT QTypeKey FROM SRC_DBASE.dbo.CTUserFormsQuestionMaster WHERE ID = @MinKey1 AND Question IN(SELECT Question FROM CTUserFormsDetail WHERE CTUserFormsMasterKey = @NewKey)) 
+	SET	@QMDateTypeKey = (SELECT DateTypeKey FROM SRC_DBASE.dbo.CTUserFormsQuestionMaster WHERE ID = @MinKey1 AND Question IN(SELECT Question FROM CTUserFormsDetail WHERE CTUserFormsMasterKey = @NewKey))
+	SET	@QMStringLength = (SELECT StringLength FROM SRC_DBASE.dbo.CTUserFormsQuestionMaster WHERE ID = @MinKey1 AND Question IN(SELECT Question FROM CTUserFormsDetail WHERE CTUserFormsMasterKey = @NewKey))
+	SET	@QMStringFormatKey = (SELECT StringFormatKey FROM SRC_DBASE.dbo.CTUserFormsQuestionMaster WHERE ID = @MinKey1 AND Question IN(SELECT Question FROM CTUserFormsDetail WHERE CTUserFormsMasterKey = @NewKey))
+	SET	@QMRows = (SELECT Rows FROM SRC_DBASE.dbo.CTUserFormsQuestionMaster WHERE ID = @MinKey1 AND Question IN(SELECT Question FROM CTUserFormsDetail WHERE CTUserFormsMasterKey = @NewKey))
+	SET	@QMFieldWidth = (SELECT FieldWidth FROM SRC_DBASE.dbo.CTUserFormsQuestionMaster WHERE ID = @MinKey1 AND Question IN(SELECT Question FROM CTUserFormsDetail WHERE CTUserFormsMasterKey = @NewKey))
+	SET	@QMComments = (SELECT Comments FROM SRC_DBASE.dbo.CTUserFormsQuestionMaster WHERE ID = @MinKey1 AND Question IN(SELECT Question FROM CTUserFormsDetail WHERE CTUserFormsMasterKey = @NewKey))
+	SET	@QMCTUserFormsCoreFieldKey = (SELECT CTUserFormsCoreFieldKey FROM SRC_DBASE.dbo.CTUserFormsQuestionMaster WHERE ID = @MinKey1 AND Question IN(SELECT Question FROM CTUserFormsDetail WHERE CTUserFormsMasterKey = @NewKey))
 	SET	@QMCTUserFormsQuestionMasterGUID = NewID()
-	SET	@QMCTUserFormsCoreFieldGUID = (SELECT CTUserFormsCoreFieldGUID FROM Claimtrakv0905_bangell_06DEC2015.dbo.CTUserFormsQuestionMaster WHERE ID = @MinKey1 AND Question IN(SELECT Question FROM CTUserFormsDetail WHERE CTUserFormsMasterKey = @NewKey))
+	SET	@QMCTUserFormsCoreFieldGUID = (SELECT CTUserFormsCoreFieldGUID FROM SRC_DBASE.dbo.CTUserFormsQuestionMaster WHERE ID = @MinKey1 AND Question IN(SELECT Question FROM CTUserFormsDetail WHERE CTUserFormsMasterKey = @NewKey))
 	
 	IF @QMQuestion IS NOT NULL
 	BEGIN
@@ -349,16 +350,16 @@ Print '339 CTUserFormsQuestionMaster row: QMnewID '+convert(varchar(10), @QMNewI
 		IF @QMQTypeKey in (3, 4)	-- 3 = Drop Down, 4 = MultiCheck List Box
 		BEGIN
 			SELECT @MinKey2 = MIN(ID), @MaxKey2 = MAX(ID)
-			FROM Claimtrakv0905_bangell_06DEC2015.dbo.CTUserFormsQuestionListOptions
+			FROM SRC_DBASE.dbo.CTUserFormsQuestionListOptions
 			WHERE CTUserFormsQuestionMasterKey = @MinKey1
 			
 			WHILE @MinKey2 <= @MaxKey2
 			BEGIN
 				SET @OCTUserFormsQuestionMasterKey = @QMNewID
-				SET @ODescription = (SELECT Description FROM Claimtrakv0905_bangell_06DEC2015.dbo.CTUserFormsQuestionListOptions WHERE ID = @MinKey2 AND CTUserFormsQuestionMasterKey = @MinKey1)
-				SET @ODisplayOrder = (SELECT DisplayOrder FROM Claimtrakv0905_bangell_06DEC2015.dbo.CTUserFormsQuestionListOptions WHERE ID = @MinKey2 AND CTUserFormsQuestionMasterKey = @MinKey1)	
-				SET @OEffectiveDate = (SELECT EffectiveDate FROM Claimtrakv0905_bangell_06DEC2015.dbo.CTUserFormsQuestionListOptions WHERE ID = @MinKey2 AND CTUserFormsQuestionMasterKey = @MinKey1)
-				SET @OExpirationDate = (SELECT ExpirationDate FROM Claimtrakv0905_bangell_06DEC2015.dbo.CTUserFormsQuestionListOptions WHERE ID = @MinKey2 AND CTUserFormsQuestionMasterKey = @MinKey1)
+				SET @ODescription = (SELECT Description FROM SRC_DBASE.dbo.CTUserFormsQuestionListOptions WHERE ID = @MinKey2 AND CTUserFormsQuestionMasterKey = @MinKey1)
+				SET @ODisplayOrder = (SELECT DisplayOrder FROM SRC_DBASE.dbo.CTUserFormsQuestionListOptions WHERE ID = @MinKey2 AND CTUserFormsQuestionMasterKey = @MinKey1)	
+				SET @OEffectiveDate = (SELECT EffectiveDate FROM SRC_DBASE.dbo.CTUserFormsQuestionListOptions WHERE ID = @MinKey2 AND CTUserFormsQuestionMasterKey = @MinKey1)
+				SET @OExpirationDate = (SELECT ExpirationDate FROM SRC_DBASE.dbo.CTUserFormsQuestionListOptions WHERE ID = @MinKey2 AND CTUserFormsQuestionMasterKey = @MinKey1)
 				SET @OCTUserFormsQuestionListOptionsGUID = NewID()
 				SET @OCTUserFormsQuestionMasterGUID = @QMCTUserFormsQuestionMasterGUID
 				
