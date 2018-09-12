@@ -8,7 +8,35 @@ DECLARE @paramsXml_4b35f9 xml, @exErrorNumber_4b35f9 int, @exErrorLine_4b35f9 in
 SET @exTranCount_4b35f9 = @@TRANCOUNT;
 select  @currDateTime = [dbo].CTSP_Core_DigiShare_GetHL7_DTM (getdate(),'s');
  
---===========================================================================================================================================================
+/*===========================================================================================================================================================
+The following query was used to get the tables with client keys
+SELECT DISTINCT
+        [s].[name]        AS [SchemaName]
+       ,[t].[name]        AS [TableName]
+       ,SUM( [p].[Rows] ) AS [Rows]
+       ,CONVERT( bit, 0 ) AS [HasIDCol]
+    FROM [sys].[tables] AS [t]
+    INNER JOIN [sys].[schemas] AS [s]
+        ON [t].[schema_id] = [s].[schema_id]
+       AND [t].[type] = N'U'
+       AND [t].[is_ms_shipped] = 0
+       AND [t].[name] NOT IN ( N'VoFundHistoryImport', N'ClientMasterCurrentData' )
+       AND [t].[name] NOT LIKE N'aaa%'
+       AND [t].[name] NOT LIKE N'zzz%'
+	   AND [t].[name] NOT LIKE N'FFCollaboratorDataReturned%'
+	   AND [t].[name] <> 'SADxGuardMaintenanceLog'  --Adding the table to the exclusion list CS-137 2018/07/09 RBJ
+    INNER JOIN [sys].[columns] AS [c]
+        ON [t].[object_id] = [c].[object_id]
+       AND [c].[name] IN ( N'ClientKey' ) -- Only find tables with columns named "ClientKey"
+    INNER JOIN [sys].[partitions] AS [p]
+        ON [t].[object_id] = [p].[object_id]
+       AND [p].[index_id] IN ( 1, 0 )
+    WHERE [s].[name] IN ( N'dbo' ) -- Restrict to the 'dbo' schema for now.
+    GROUP BY [s].[name], [t].[name]
+    HAVING SUM( [p].[rows] ) > 0
+    ORDER BY SUM( [p].[Rows] ) DESC;
+
+----------------------------------------------------------------------------------------*/
 IF EXISTS (SELECT 1 FROM [dbo].[ProviderMaster] WHERE [CLMTRKNetworkId]='VBHCKS')
 BEGIN
     DECLARE @errorMsg NVARCHAR(MAX),
