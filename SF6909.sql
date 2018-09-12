@@ -49,15 +49,15 @@ BEGIN
 /*  backup of tables */
 
 	SELECT * INTO   [bak].SF6909ba20180912_TRPLog	FROM [dbo].	TRPLog WHERE ClientKey=92496 and id in
-					 (select ID from TRPLog t inner join ClientPacket p on p.ID=t.PacketKey
-						  where t.ClientKey=92496 and EnrollmentKey=688108 )
+					 (select t.ID from TRPLog t inner join ClientPacket p on p.ID=t.PacketKey
+						  where t.ClientKey=92496 and p.ClientEnrollmentKey=688108 )
 	SELECT * INTO   [bak].SF6909ba20180912_ClientAccessLog	FROM [dbo].	ClientAccessLog	 WHERE ClientKey=92496 and EnrollmentKey=688108 
 	SELECT * INTO   [bak].SF6909ba20180912_ClientPacket	FROM [dbo].	ClientPacket	 WHERE ClientKey=92496 and ClientEnrollmentKey=688108 
 	SELECT * INTO   [bak].SF6909ba20180912_ClientICD	FROM [dbo].	ClientICD	 WHERE ClientKey=92496 and EnrollmentKey=688108 
 	SELECT * INTO   [bak].SF6909ba20180912_ClientPacketForms	FROM [dbo].	ClientPacketForms	 WHERE ClientKey=92496 and ClientEnrollmentKey=688108 
 	SELECT * INTO   [bak].SF6909ba20180912_ClientPacketCommonDx2015MigrationHistory	FROM [dbo].	ClientPacketCommonDx2015MigrationHistory	 WHERE ClientKey=92496 and EnrollmentKey=688108 
 	SELECT * INTO   [bak].SF6909ba20180912_PNChartQuestionResponseMaster	FROM [dbo].	PNChartQuestionResponseMaster	 WHERE ClientKey=92496 and EnrollmentKey=688108 
-	SELECT * INTO   [bak].SF6909ba20180912_ClientProgressNote	FROM [dbo].	ClientProgressNote	 WHERE ClientKey=92496 and ClientEnrollmentKey=688108 
+	SELECT * INTO   [bak].SF6909ba20180912_ClientProgressNote	FROM [dbo].	ClientProgressNote	 WHERE ClientKey=92496 and ClientEnrollment=688108 
 	SELECT * INTO   [bak].SF6909ba20180912_Alerts	FROM [dbo].	Alerts	 WHERE ClientKey=92496 and EnrollmentKey=688108 
 	SELECT * INTO   [bak].SF6909ba20180912_SignedForms	FROM [dbo].	SignedForms	 WHERE ClientKey=92496 and EnrollmentKey=688108 
 	SELECT * INTO   [bak].SF6909ba20180912_ReleaseOfInformationToCategories	FROM [dbo].	ReleaseOfInformationToCategories	 WHERE ClientKey=92496 and EnrollmentKey=688108 
@@ -93,7 +93,7 @@ BEGIN
 
 	/* ----------------------------------------------Update [dbo]. REPLACE ClientKey 92496 with 100000 */
 	Update [dbo].TRPLog	SET ClientKey=100000 WHERE ClientKey=92496 and id in 
-		(select ID from TRPLog t inner join ClientPacket p on p.ID=t.PacketKey
+		(select t.ID from TRPLog t inner join ClientPacket p on p.ID=t.PacketKey
 			where t.ClientKey=92496 and ClientEnrollmentKey=688108)
 	Update [dbo].ClientAccessLog	SET ClientKey=100000 WHERE ClientKey=92496 and EnrollmentKey=688108 
 	Update [dbo].ClientPacket	SET ClientKey=100000 WHERE ClientKey=92496 and ClientEnrollmentKey=688108 
@@ -137,7 +137,7 @@ BEGIN
 
 	EXEC CTSP_Core_Utility_RebuildClientCurrentDataByClient 92496
 
-        EXEC CTSP_Core_Utility_RebuildClientCurrentDataByClient 100000
+    EXEC CTSP_Core_Utility_RebuildClientCurrentDataByClient 100000
 
 	COMMIT TRANSACTION [tr1];      
 		  SET TRANSACTION ISOLATION LEVEL READ COMMITTED;                
