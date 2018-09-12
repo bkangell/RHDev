@@ -83,7 +83,7 @@ BEGIN
 	SELECT * INTO   [bak].SF6909ba20180912_ScoreTrakClientTargetMaster	FROM [dbo].	ScoreTrakClientTargetMaster	 WHERE ClientKey=92496 and CreateDateTime>'2018-09-01'
 	SELECT * INTO   [bak].SF6909ba20180912_ClientStatusKids	FROM [dbo].	ClientStatusKids	 WHERE ClientKey=92496 and EnrollmentKey=688108 
 	SELECT * INTO   [bak].SF6909ba20180912_Closure	FROM [dbo].	Closure	 WHERE ClientKey=92496 and EnrollmentKey=688108 
-	SELECT * INTO   [bak].SF6909ba20180912_DiagnosisUpdate [dbo].	FROM [dbo].	DiagnosisUpdate [dbo].	 WHERE ClientKey=92496 and EnrollmentKey=688108 
+	SELECT * INTO   [bak].SF6909ba20180912_DiagnosisUpdate FROM [dbo].DiagnosisUpdate  WHERE ClientKey=92496 and EnrollmentKey=688108 
 	SELECT * INTO   [bak].SF6909ba20180912_PNChartMaster	FROM [dbo].	PNChartMaster	 WHERE ClientKey=92496 and EnrollmentKey=688108 
 	SELECT * INTO   [bak].SF6909ba20180912_ClientComms	FROM [dbo].	ClientComms	 WHERE ClientKey=92496 
 	SELECT * INTO   [bak].SF6909ba20180912_ValeoInHouseCSCRef	FROM [dbo].	ValeoInHouseCSCRef	 WHERE ClientKey=92496 and EnrollmentKey=688108 
